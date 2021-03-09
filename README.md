@@ -1,15 +1,15 @@
-# Puppy adoption app
+# Countdown Timer app
 
 <!--- Replace <OWNER> with your Github Username and <REPOSITORY> with the name of your repository. -->
 <!--- You can find both of these in the url bar when you open your repository in github. -->
-![Workflow result](https://github.com/BALUSANGEM/android-dev-challenge-compose/workflows/Check/badge.svg)
+![Workflow result](https://github.com/MirzaAhmedBaig/android-dev-challenge-compose/workflows/Check/badge.svg)
 
 
 ## :scroll: Description
-Puppy adoption app lists few types of breeds, you can find detailed information by clicking on a puppy.
+A countdown timer counts down from 30 sec.
 
 ## :bulb: Motivation and Context
-Skipping adapters and recyclerview for list was interesting, also using Navigation without having xml graph file was great.
+Using ViewModel with compose to maintain state was interesting. Animation with compose is neat.
 
 ## :camera_flash: Screenshots
 <!-- You can add more screenshots here if you like -->
