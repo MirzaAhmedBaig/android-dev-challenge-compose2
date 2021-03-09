@@ -16,7 +16,6 @@
 package com.example.androiddevchallenge.ui.components
 
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.LinearEasing
@@ -54,17 +53,21 @@ import com.example.androiddevchallenge.viewmodel.TimerViewModel
 fun TimerScreen(viewModel: TimerViewModel) {
 
     var isRunning by rememberSaveable { mutableStateOf(false) }
-    val time by viewModel.millisUntilFinished.observeAsState(viewModel.millisInFuture)
+    val time by viewModel.millisUntilFinished.observeAsState()
 
     DisposableEffect(isRunning) {
         val countdownTimer =
-            object : CountDownTimer(time, viewModel.countdownInterval) {
+            object : CountDownTimer(
+                if (time == 0L) viewModel.millisInFuture else time!!,
+                viewModel.countdownInterval
+            ) {
                 override fun onTick(millisUntilFinished: Long) {
                     viewModel.onTimeChanged(millisUntilFinished)
                 }
 
                 override fun onFinish() {
                     isRunning = false
+                    viewModel.onTimeChanged(viewModel.millisInFuture)
                 }
             }
 
@@ -73,25 +76,22 @@ fun TimerScreen(viewModel: TimerViewModel) {
         } else {
             countdownTimer.cancel()
         }
-        Log.d("TimerScreen", " Calling to DisposableEffect $time")
 
         onDispose {
             countdownTimer.cancel()
         }
     }
 
-    val progress = if (isRunning) time / viewModel.millisInFuture.toFloat() else 0f
+    val progress = time!! / viewModel.millisInFuture.toFloat()
 
     val animatedProgress = remember { Animatable(0f) }
 
     LaunchedEffect(isRunning) {
         if (isRunning) {
             val target = if (progress == 0f) 1f else progress
-            // Start the first animation using spring and wait for result
             val result = animatedProgress.animateTo(target)
             if (result.endReason == AnimationEndReason.Finished) {
-                val nextDurationInMillis = (viewModel.millisInFuture).toInt()
-                // Now we can start the second one using tween
+                val nextDurationInMillis = time!!.toInt()
                 animatedProgress.animateTo(
                     targetValue = 0f,
                     animationSpec = tween(
@@ -101,14 +101,13 @@ fun TimerScreen(viewModel: TimerViewModel) {
                 )
             }
         } else {
-            if (progress == 1f)
-                animatedProgress.animateTo(1f)
+            animatedProgress.animateTo(progress)
         }
     }
 
     Scaffold(topBar = { AppBar(appBarText = "Countdown Timer") }) {
         TimerScreenContent(
-            time = time.formatElapsedTime(),
+            time = time!!,
             progress = animatedProgress.value,
             isRunning = isRunning,
             onPlay = {
@@ -127,7 +126,7 @@ fun TimerScreen(viewModel: TimerViewModel) {
 
 @Composable
 fun TimerScreenContent(
-    time: String,
+    time: Long,
     progress: Float,
     isRunning: Boolean,
     onPlay: () -> Unit,
@@ -154,7 +153,7 @@ fun TimerScreenContent(
                 progress = progress
             )
             Text(
-                text = time,
+                text = time.formatElapsedTime(),
                 color = MaterialTheme.colors.onBackground,
                 style = MaterialTheme.typography.h2.copy(fontWeight = FontWeight.Normal)
             )
