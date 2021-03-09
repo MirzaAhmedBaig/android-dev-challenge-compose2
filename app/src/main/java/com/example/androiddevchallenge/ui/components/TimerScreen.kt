@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.ui.components
 
 import android.os.CountDownTimer
@@ -6,11 +21,26 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,7 +56,7 @@ fun TimerScreen(viewModel: TimerViewModel) {
     var isRunning by rememberSaveable { mutableStateOf(false) }
     val time by viewModel.millisUntilFinished.observeAsState(viewModel.millisInFuture)
 
-    DisposableEffect(time==viewModel.millisInFuture) {
+    DisposableEffect(isRunning) {
         val countdownTimer =
             object : CountDownTimer(time, viewModel.countdownInterval) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -76,7 +106,6 @@ fun TimerScreen(viewModel: TimerViewModel) {
         }
     }
 
-
     Scaffold(topBar = { AppBar(appBarText = "Countdown Timer") }) {
         TimerScreenContent(
             time = time.formatElapsedTime(),
@@ -95,7 +124,6 @@ fun TimerScreen(viewModel: TimerViewModel) {
         )
     }
 }
-
 
 @Composable
 fun TimerScreenContent(
@@ -138,5 +166,4 @@ fun TimerScreenContent(
         TimerButton(isRunning, onPlay, onPause)
         Spacer(modifier = Modifier.weight(.1f))
     }
-
 }
